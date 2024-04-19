@@ -1,0 +1,194 @@
+*,
+*::after,
+*::before {
+    padding: 0;
+    margin: 0;
+    box-sizing: inherit;
+}
+
+body {
+    box-sizing: border-box;
+    font-family: "Libre Baskerville", serif;
+
+    min-height: 100vh;
+
+    display: grid;
+    grid-template-columns: 1fr 10fr 1fr;
+}
+
+.cards {
+    margin-top: 50px;
+}
+
+.app {
+    padding-top: 100px;
+
+    grid-column: 2 / 3;
+}
+
+.add-book {
+    font-weight: 600;
+
+    margin-top: 50px;
+
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.add {
+    padding: 5px 15px;
+    border-radius: 10px;
+
+    font-size: 30px;
+
+    border: none;
+    outline: none;
+
+    color: white;
+    background-color: #97F79B;
+
+    transition: all .4s;
+}
+
+.add:hover {
+    background-color: #5DEB63;
+    cursor: pointer;
+}
+
+.add-book-desc {
+    font-size: 20px;
+    text-transform: uppercase;
+}
+
+.delete, .change-status {
+    width: 30px;
+}
+
+.cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 10px;
+}
+
+.card {
+    font-size: 16px;
+
+    width: 250px;
+
+    border: 1px solid rgb(0 0 0 / 0.25);
+
+    text-align: center;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.card-buttons {
+    padding: 10px;
+
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.card-buttons div:hover {
+    cursor: pointer;
+}
+
+.delete svg path {
+    fill: red;
+}
+
+.change-status svg path {
+    transition: all .3s;
+}
+
+.on-read svg path {
+    fill: #5DEB63;
+}
+
+.title, .card-buttons {
+    background-color: #EDEDED;
+}
+
+.title {
+    border-bottom: 1px solid rgb(0 0 0 / 0.25);
+}
+
+.title, .author, .pages, .status, .salaries {
+    padding: 15px 10px;
+}
+
+.author, .pages, .status, .salaries {
+    text-align: left;
+}
+
+.hidden {
+    opacity: 0;
+    visibility: hidden;
+}
+
+.new-book {
+    padding: 40px 10px;
+    position: absolute;
+
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+    box-shadow: 0px 0px 1000px 10000px rgba(0,0,0,0.9);
+
+    transition: all .3s;
+
+    background-color: white;
+}
+
+.new-book input {
+    font-size: 20px;
+    font-family: inherit;
+
+    padding: 10px 15px;
+    width: 300px;
+}
+
+.new-book-btns {
+    display: flex;
+    gap: 10px;
+}
+
+.new-book-btns button {
+    border: none;
+    outline: none;
+
+    font-size: 20px;
+
+    padding: 5px 15px;
+
+    color: #fff;
+
+    transition: all .3s;
+}
+
+.new {
+    background-color: #97F79B;
+}
+
+.new:hover {
+    cursor: pointer;
+    background-color: #5DEB63;
+}
+
+.cancel {
+    background-color: rgb(177, 77, 77);
+}
+
+.cancel:hover {
+    cursor: pointer;
+    background-color: red;
+}
