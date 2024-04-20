@@ -90,6 +90,12 @@ function insertBookToLibrary(title, author, pages, salaries) {
   div.dataset.bookNumber = myLibrary.length - 1;
   div.innerHTML = bookHTML(title, author, pages, salaries);
   root.appendChild(div);
+
+  const deleteBook = div.querySelector('.delete');
+  const readBooks = div.querySelector('.change-status');
+
+  readBooks.addEventListener('click', readListener);
+  deleteBook.addEventListener('click', deleteListener);
 }
 
 addBookToLibrary("The Hobbit", "J. R. R. Tolkien", 295, null, "100$");
@@ -101,49 +107,25 @@ addBookToLibrary(
   "200$"
 );
 
-// Observe any DOM Mutations
-
-function observer(mutatuions) {
-  const deleteBook = document.querySelectorAll(".delete");
-  const readBooks = document.querySelectorAll(".change-status");
-
-  readBooks.forEach((read) =>
-    read.addEventListener("click", function (e) {
-      let toggle = e.target.closest(".change-status");
-      let data = e.target.closest(".card");
-
-      toggle.classList.toggle("on-read");
-
-      if (toggle.classList.contains("on-read")) {
-        changeReadStatus(data, "read");
-      } else {
-        changeReadStatus(data, "notread");
-      }
-    })
-  );
-  deleteBook.forEach((book) =>
-    book.addEventListener("click", function (e) {
-      console.log("click")
-      let data = e.target.closest(".card");
-      deleteBookFromLibrary(data);
-    })
-  );
-}
-
-const rootObserver = new MutationObserver(observer);
-
 // Event listeners
 const form = document.querySelector(".new-book");
 
 window.addEventListener("DOMContentLoaded", () => {
-  rootObserver.observe(root, {
-    childList: true,
-  });
 
   displayLibraryBooks();
   const add = document.querySelector(".add");
   const cancel = document.querySelector(".cancel");
   const newBook = document.querySelector(".new");
+  const deleteBook = document.querySelectorAll('.delete');
+  const readBooks = document.querySelectorAll('.change-status');
+
+  readBooks.forEach((read) =>
+    read.addEventListener("click", readListener)
+  );
+
+  deleteBook.forEach((book) =>
+    book.addEventListener("click", deleteListener)
+  );
 
   add.addEventListener("click", function (e) {
     e.preventDefault();
@@ -177,3 +159,23 @@ window.addEventListener("DOMContentLoaded", () => {
     form.classList.add("hidden");
   });
 });
+
+// Event listener functions
+
+function readListener(e) {
+  let toggle = e.target.closest(".change-status");
+  let data = e.target.closest(".card");
+
+  toggle.classList.toggle("on-read");
+
+  if (toggle.classList.contains("on-read")) {
+    changeReadStatus(data, "read");
+  } else {
+    changeReadStatus(data, "notread");
+  }
+}
+
+function deleteListener(e) {
+    let data = e.target.closest(".card");
+    deleteBookFromLibrary(data);
+}
