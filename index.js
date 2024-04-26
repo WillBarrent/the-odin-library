@@ -1,31 +1,89 @@
 const root = document.querySelector(".cards");
+const form = document.querySelector(".new-book");
+const add = document.querySelector(".add");
+const cancel = document.querySelector(".cancel");
+const newBook = document.querySelector(".new");
 
 const myLibrary = [];
 
-function Book(title, author, pages, read = null, salaries = null) {
-  this.title = title;
-  this.author = author;
-  this.pages = pages;
-  this.read = read;
-  this.salaries = salaries;
-  this.info = function () {
+class Book {
+  constructor(title, author, pages, readStatus, salaries) {
+    this.title = title;
+    this.author = author;
+    this.pages = pages;
+    this.readStatus = readStatus;
+    this.salaries = salaries;
+  }
+
+  info() {
     return `${this.title} by ${this.author}, ${this.pages} pages, ${
       this.read == null ? "not read yet" : this.read
     }`;
-  };
+  }
+
+  static addBookToLibrary(title, author, pages, read, salaries) {
+    let book = new Book(title, author, pages, read, salaries);
+    myLibrary.push(book);
+  }
+
+  static researchBook(data) {
+    for (let i = 0; i < myLibrary.length; i++) {
+      if (i == data) {
+        return [myLibrary[i], i];
+      }
+    }
+  }
+
+  static createTemplate() {
+    Book.addBookToLibrary(
+      "What do you do with an idea?",
+      "Kobi Yamada",
+      100,
+      "Not Read",
+      "10$"
+    );
+    Book.addBookToLibrary(
+      "The Lord of the Rings",
+      "J. R. R. Tolkien",
+      100,
+      "Read",
+      "100$"
+    );
+    Book.addBookToLibrary(
+      "The Status Civilization",
+      "Robert Shackley",
+      100,
+      "Read",
+      "100$"
+    );
+  }
 }
 
-Book.prototype.cost = function () {
-  return this.salaries;
-};
+// Because i need a book template for my page
+Book.createTemplate();
 
-function bookHTML(title, author, pages, salaries, read = null) {
-  return `
+class DOMController extends Book {
+  constructor(title, author, pages, readStatus, salaries) {
+    super(title, author, pages, readStatus, salaries);
+  }
+
+  static newElement(HTMLelement, className, data, HTML) {
+    let element = document.createElement(HTMLelement);
+    element.className = className;
+    element.dataset.bookNumber = data;
+    element.innerHTML = HTML;
+    root.appendChild(element);
+  }
+
+  static bookHTML(title, author, pages, salaries, read) {
+    return `
     <div class="title">Title: ${title}</div>
     <div class="author">Author: ${author}</div>
     <div class="pages">Pages: ${pages}</div>
     <div class="salaries">Salaries: ${parseInt(salaries)}$</div>
-    <div class="status">Read: ${read == null ? "Not Read" : "Read"}</div>
+    <div class="status">Read: ${
+      read == null || read == undefined ? "Not Read" : "Read"
+    }</div>
     <div class="card-buttons">
         <div class="delete">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
@@ -42,105 +100,80 @@ function bookHTML(title, author, pages, salaries, read = null) {
         </svg>
         </div>
     </div>`;
-}
+  }
 
-function addBookToLibrary(title, author, pages, read = null, salaries = "1$") {
-  let book = new Book(title, author, pages, read, salaries);
-  myLibrary.push(book);
-}
-
-function displayLibraryBooks() {
-  myLibrary.forEach((book, counter) => {
-    let div = document.createElement("div");
-    div.className = "card";
-    div.dataset.bookNumber = counter;
-    div.innerHTML = bookHTML(
-      book.title,
-      book.author,
-      book.pages,
-      book.salaries
+  static displayLibraryBooks() {
+    root.innerHTML = ``;
+    myLibrary.forEach((book, counter) =>
+      this.newElement(
+        "div",
+        "card",
+        counter,
+        DOMController.bookHTML(
+          book.title,
+          book.author,
+          book.pages,
+          book.salaries
+        )
+      )
     );
-    root.appendChild(div);
-  });
-}
+  }
 
-function researchBook(data) {
-  for (let i = 0; i < myLibrary.length; i++) {
-    if (i == data) {
-      return [myLibrary[i], i];
-    }
+  static insertBookToLibrary(title, author, pages, salaries) {
+    DOMController.newElement(
+      "div",
+      "card",
+      myLibrary.length - 1,
+      DOMController.bookHTML(title, author, pages, salaries)
+    );
+  }
+
+  static deleteBookFromLibrary(data) {
+    let bookIndex = Book.researchBook(data.dataset.bookNumber)[1];
+    myLibrary[bookIndex] = null; // I think that i delete i :))))
+    root.removeChild(data);
+  }
+
+  static changeReadStatus(data, status) {
+    let book = Book.researchBook(data.dataset.bookNumber)[0];
+    book.read = status == "read" ? "Read!" : "Not Read";
+    data.querySelector(".status").textContent = `Read: ${book.read}`;
   }
 }
 
-function deleteBookFromLibrary(data) {
-  let bookIndex = researchBook(data.dataset.bookNumber)[1];
-  myLibrary[bookIndex] = null; // I think that i delete i :))))
-  root.removeChild(data);
-}
+class EventListeners extends DOMController {
+  static readListener(e) {
+    let toggle = e.target.closest(".change-status");
+    let data = e.target.closest(".card");
 
-function changeReadStatus(data, status) {
-  let book = researchBook(data.dataset.bookNumber)[0];
-  book.read = status == "read" ? "Read!" : "Not Read";
-  data.querySelector(".status").textContent = `Read: ${book.read}`;
-}
+    toggle.classList.toggle("on-read");
 
-function insertBookToLibrary(title, author, pages, salaries) {
-  let div = document.createElement("div");
-  div.className = "card";
-  div.dataset.bookNumber = myLibrary.length - 1;
-  div.innerHTML = bookHTML(title, author, pages, salaries);
-  root.appendChild(div);
+    if (toggle.classList.contains("on-read")) {
+      DOMController.changeReadStatus(data, "read");
+    } else {
+      DOMController.changeReadStatus(data, "notread");
+    }
+  }
 
-  const deleteBook = div.querySelector('.delete');
-  const readBooks = div.querySelector('.change-status');
+  static deleteListener(e) {
+    let data = e.target.closest(".card");
+    DOMController.deleteBookFromLibrary(data);
+  }
 
-  readBooks.addEventListener('click', readListener);
-  deleteBook.addEventListener('click', deleteListener);
-}
-
-addBookToLibrary("The Hobbit", "J. R. R. Tolkien", 295, null, "100$");
-addBookToLibrary(
-  "The Lord Of The Rings",
-  "J. R. R. Tolkien",
-  400,
-  null,
-  "200$"
-);
-
-// Event listeners
-const form = document.querySelector(".new-book");
-
-window.addEventListener("DOMContentLoaded", () => {
-
-  displayLibraryBooks();
-  const add = document.querySelector(".add");
-  const cancel = document.querySelector(".cancel");
-  const newBook = document.querySelector(".new");
-  const deleteBook = document.querySelectorAll('.delete');
-  const readBooks = document.querySelectorAll('.change-status');
-
-  readBooks.forEach((read) =>
-    read.addEventListener("click", readListener)
-  );
-
-  deleteBook.forEach((book) =>
-    book.addEventListener("click", deleteListener)
-  );
-
-  add.addEventListener("click", function (e) {
+  static addListener(e) {
     e.preventDefault();
 
     if (form.classList.contains("hidden")) {
       form.classList.remove("hidden");
     }
-  });
+  }
 
-  cancel.addEventListener("click", function (e) {
+  static cancelListener(e) {
     e.preventDefault();
     form.classList.add("hidden");
-  });
+  }
 
-  newBook.addEventListener("click", function (e) {
+  static newBookListener(e) {
     e.preventDefault();
 
     const inputTitle = document.querySelector(".input-title").value;
@@ -148,34 +181,60 @@ window.addEventListener("DOMContentLoaded", () => {
     const inputPages = document.querySelector(".input-pages").value;
     const inputSalaries = document.querySelector(".input-salaries").value;
 
-    addBookToLibrary(
+    Book.addBookToLibrary(
       inputTitle,
       inputAuthor,
       inputPages,
       undefined,
       inputSalaries
     );
-    insertBookToLibrary(inputTitle, inputAuthor, inputPages, inputSalaries);
+
+    EventListeners.insertBookToLibrary(
+      inputTitle,
+      inputAuthor,
+      inputPages,
+      inputSalaries
+    );
     form.classList.add("hidden");
-  });
-});
+  }
 
-// Event listener functions
+  static displayLibraryBooks() {
+    super.displayLibraryBooks();
+    document
+      .querySelectorAll(".change-status")
+      .forEach((book) =>
+        book.addEventListener("click", EventListeners.readListener)
+      );
+    document
+      .querySelectorAll(".delete")
+      .forEach((book) =>
+        book.addEventListener("click", EventListeners.deleteListener)
+      );
+  }
 
-function readListener(e) {
-  let toggle = e.target.closest(".change-status");
-  let data = e.target.closest(".card");
+  static insertBookToLibrary(title, author, pages, salaries) {
+    super.insertBookToLibrary(title, author, pages, salaries);
+    document
+      .querySelectorAll(".change-status")
+      .forEach((book) =>
+        book.addEventListener("click", EventListeners.readListener)
+      );
+    document
+      .querySelectorAll(".delete")
+      .forEach((book) =>
+        book.addEventListener("click", EventListeners.deleteListener)
+      );
+  }
 
-  toggle.classList.toggle("on-read");
-
-  if (toggle.classList.contains("on-read")) {
-    changeReadStatus(data, "read");
-  } else {
-    changeReadStatus(data, "notread");
+  formListener() {
+    add.addEventListener("click", EventListeners.addListener);
+    cancel.addEventListener("click", EventListeners.cancelListener);
+    newBook.addEventListener("click", EventListeners.newBookListener);
   }
 }
 
-function deleteListener(e) {
-    let data = e.target.closest(".card");
-    deleteBookFromLibrary(data);
-}
+EventListeners.displayLibraryBooks();
+
+const formListener = (new EventListeners()).formListener;
+
+formListener();
