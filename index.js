@@ -174,8 +174,6 @@ class EventListeners extends DOMController {
   }
 
   static newBookListener() {
-    // e.preventDefault();
-
     const inputTitle = document.querySelector(".input-title").value;
     const inputAuthor = document.querySelector(".input-author").value;
     const inputPages = document.querySelector(".input-pages").value;
@@ -229,11 +227,6 @@ class EventListeners extends DOMController {
   formListener() {
     add.addEventListener("click", EventListeners.addListener);
     cancel.addEventListener("click", EventListeners.cancelListener);
-    // newBook.addEventListener("click", (e) => {
-    //   if (!form.classList.contains("hasError")) {
-        
-    //   }
-    // });
   }
 }
 
