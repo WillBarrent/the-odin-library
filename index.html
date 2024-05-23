@@ -13,11 +13,13 @@
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <form class="new-book hidden">
-      <input type="text" class="input-title" placeholder="Title" required>
-      <input type="text" class="input-author" placeholder="Author" required>
-      <input type="text" class="input-pages" placeholder="Pages" required>
-      <input type="text" class="input-salaries" placeholder="Salaries of book" required>
+    <form class="new-book hidden hasError" novalidate>
+      <div class="new-book-title">New Book Form</div>
+      <div class="error">Title Input Wrong</div>
+      <input type="text" class="input-title" placeholder="Title" required minlength="2">
+      <input type="text" class="input-author" placeholder="Author" required minlength="7">
+      <input type="number" class="input-pages" placeholder="Pages" required>
+      <input type="number" class="input-salaries" placeholder="Salaries of book" required>
 
       <div class="new-book-btns">
         <button class="cancel">Cancel</button>

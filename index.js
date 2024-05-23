@@ -173,8 +173,8 @@ class EventListeners extends DOMController {
     form.classList.add("hidden");
   }
 
-  static newBookListener(e) {
-    e.preventDefault();
+  static newBookListener() {
+    // e.preventDefault();
 
     const inputTitle = document.querySelector(".input-title").value;
     const inputAuthor = document.querySelector(".input-author").value;
@@ -229,12 +229,100 @@ class EventListeners extends DOMController {
   formListener() {
     add.addEventListener("click", EventListeners.addListener);
     cancel.addEventListener("click", EventListeners.cancelListener);
-    newBook.addEventListener("click", EventListeners.newBookListener);
+    // newBook.addEventListener("click", (e) => {
+    //   if (!form.classList.contains("hasError")) {
+        
+    //   }
+    // });
   }
 }
 
+class formValidation {
+  constructor(title, author, pages, salaries) {
+    this.titleError = title;
+    this.authorError = author;
+    this.pagesError = pages;
+    this.salariesError = salaries;
+    this.formError = "Your inputs is wrong. Rewrite it again.";
+  }
+
+  validate() {
+    const form = document.querySelector(".new-book");
+
+    const errorField = document.querySelector(".error");
+
+    const inputTitle = document.querySelector(".input-title");
+    const inputAuthor = document.querySelector(".input-author");
+    const inputPages = document.querySelector(".input-pages");
+    const inputSalaries = document.querySelector(".input-salaries");
+
+    const bindThis = this;
+
+    this.validateLayout(inputTitle, errorField, bindThis, "titleError");
+    this.validateLayout(inputAuthor, errorField, bindThis, "authorError");
+    this.validateLayout(inputPages, errorField, bindThis, "pagesError");
+    this.validateLayout(inputSalaries, errorField, bindThis, "salariesError");
+
+    form.addEventListener("submit", function (event) {
+      event.preventDefault();
+
+      const noValidate = !inputTitle.validity.valid
+        ? inputTitle
+        : !inputAuthor.validity.valid
+        ? inputAuthor
+        : !inputPages.validity.valid
+        ? inputPages
+        : !inputSalaries.validity.valid
+        ? inputSalaries
+        : "";
+      if (noValidate !== "") {
+        form.className = "new-book hasError";
+        bindThis.showError(noValidate, bindThis["formError"]);
+      } else {
+        form.className = "new-book hidden";
+        EventListeners.newBookListener();
+      }
+    });
+  }
+
+  validateLayout(input, errorField, bindThis, errorMessage) {
+    const form = document.querySelector(".new-book");
+    input.addEventListener("input", function () {
+      if (input.validity.valid) {
+        form.className = "new-book hasError";
+        errorField.textContent = "";
+        errorField.className = "error";
+      } else {
+        bindThis.showError(input, bindThis[errorMessage]);
+      }
+    });
+  }
+
+  showError(field, errorText) {
+    const errorField = document.querySelector(".error");
+
+    if (field.validity.valueMissing) {
+      errorField.textContent = errorText;
+    } else if (field.validity.tooShort) {
+      errorField.textContent = `${errorText}. Field should be at least ${field.minLength} character,
+      you entered ${field.value.length}`;
+    }
+
+    errorField.className = "error active";
+  }
+}
+
+const formValidator = new formValidation(
+  "Title Input Wrong",
+  "Author Input Wrong",
+  "Pages Input Wrong",
+  "Salaries Input Wrong"
+);
+
+formValidator.validate();
+
 EventListeners.displayLibraryBooks();
 
-const formListener = (new EventListeners()).formListener;
+const formListener = new EventListeners().formListener;
 
 formListener();
